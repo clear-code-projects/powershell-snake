@@ -1,5 +1,5 @@
+import colorama
 from random import randint
-from colorama import Fore, init
 from pytimedinput import timedInput
 
 
@@ -9,17 +9,9 @@ FIELD_HEIGHT = 16
 SPEED = 0.3
 DIRECTIONS = {'w': (0, -1), 'a': (-1, 0), 's': (0, 1), 'd': (1, 0)}
 
-#ansi
-CLS = "2J"
-GOTO00 = "H"
-CURSOR_ON = "?25h"
-CURSOR_OFF = "?25l"
 
-
-def ansi(*code: str):
-    """ See: https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797 """
-    for c in code:
-        print(f"\033[{c}", end="")
+def p(*args):
+    print(*args, end="")
 
 
 def is_border(x, y):
@@ -27,20 +19,20 @@ def is_border(x, y):
 
 
 def print_field():
-    ansi(GOTO00)
+    p(colorama.Cursor.POS())
     row = 0
     while row <= FIELD_HEIGHT:
         col = 0
         while col <= FIELD_WIDTH:
             cell = col, row
             if is_border(col, row):
-                print(Fore.CYAN + '#', end='')
+                p(colorama.Fore.CYAN + 'X')
             elif cell in snake_body:
-                print(Fore.GREEN + 'X', end='')
+                p(colorama.Fore.GREEN + 'X')
             elif cell == apple_pos:
-                print(Fore.RED + 'a', end='')
+                p(colorama.Fore.RED + 'a')
             else:
-                print(' ', end='')
+                p(' ')
             col += 1
         row += 1
         print()
@@ -69,8 +61,8 @@ snake_body = [(5 - x, FIELD_HEIGHT // 2) for x in range(3)]
 direction = DIRECTIONS['d']
 apple_pos = place_apple()
 
-init(autoreset=True)
-ansi(CLS, CURSOR_OFF)
+colorama.init(autoreset=True)
+p(colorama.ansi.clear_screen())
 while True:
     # draw field
     print_field()
@@ -89,4 +81,4 @@ while True:
     if is_border(*snake_body[0]) or snake_body[0] in snake_body[1:]:
         break
 
-ansi(CLS, CURSOR_ON)
+p(colorama.ansi.clear_screen())
