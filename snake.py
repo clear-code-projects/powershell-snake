@@ -1,87 +1,92 @@
-from pytimedinput import timedInput
+import colorama
 from random import randint
-import os
-from colorama import Fore, init
+from pytimedinput import timedInput
 
-def print_field():
-	for cell in CELLS:
-		if cell in snake_body:
-			print(Fore.GREEN + 'X', end = '')
-		elif cell == apple_pos:
-			print(Fore.RED + 'a',end = '')
-		elif cell[1] in (0, FIELD_HEIGHT - 1) or cell[0] in (0, FIELD_WIDTH - 1):
-			print(Fore.CYAN + '#', end = '')
-		else:
-			print(' ', end = '')
-
-		if cell[0] == FIELD_WIDTH - 1:
-			print('')
-
-def update_snake():
-	global eaten
-	new_head = snake_body[0][0] + direction[0], snake_body[0][1] + direction[1]
-	snake_body.insert(0,new_head)
-	if not eaten:
-		snake_body.pop(-1)
-	eaten = False
-
-def apple_collision():
-	global apple_pos, eaten
-
-	if snake_body[0] == apple_pos:
-		apple_pos = place_apple()
-		eaten = True
-
-def place_apple():
-	col = randint(1,FIELD_WIDTH - 2)
-	row = randint(1,FIELD_HEIGHT - 2)
-	while (col, row) in snake_body:
-		col = randint(1,FIELD_WIDTH - 2)
-		row = randint(1,FIELD_HEIGHT - 2)
-	return (col,row)
-
-init(autoreset=True)
 
 # settings
 FIELD_WIDTH = 32
 FIELD_HEIGHT = 16
-CELLS = [(col,row) for row in range(FIELD_HEIGHT) for col in range(FIELD_WIDTH)]
+SPEED = 0.3
+DIRECTIONS = {'w': (0, -1), 'a': (-1, 0), 's': (0, 1), 'd': (1, 0)}
 
-# snake
-snake_body = [
-	(5,FIELD_HEIGHT // 2),
-	(4,FIELD_HEIGHT // 2),
-	(3,FIELD_HEIGHT // 2)]
-DIRECTIONS = {'left':(-1,0),'right': (1,0),'up': (0,-1),'down': (0,1)}
-direction = DIRECTIONS['right']
-eaten = False
+
+def p(*args, end=""):
+    print(*args, end=end)
+
+
+def is_border(x, y):
+    return ((x % FIELD_WIDTH) * (y % FIELD_HEIGHT)) == 0
+
+
+def print_field():
+    """ Ascii codes: https://theasciicode.com.ar/
+    """
+    p(colorama.Cursor.POS())
+    p(f"\n  SCORE: {colorama.Fore.RED}{len(snake_body) - 3}", end="\n  ")
+    row = 0
+    while row <= FIELD_HEIGHT:
+        col = 0
+        while col <= FIELD_WIDTH:
+            cell = col, row
+            if is_border(col, row):
+                if row == 0:
+                    p(colorama.Fore.CYAN + '▄')
+                elif row == FIELD_HEIGHT:
+                    p(colorama.Fore.CYAN + '▀')
+                else:
+                    p(colorama.Fore.CYAN + '█')
+            elif cell in snake_body:
+                p(colorama.Fore.GREEN + '▒')
+            elif cell == apple_pos:
+                p(colorama.Fore.RED + 'Ó')
+            else:
+                p(' ')
+            col += 1
+        row += 1
+        p('\n  ')
+
+
+def place_apple():
+    while True:
+        col = randint(1, FIELD_WIDTH - 1)
+        row = randint(1, FIELD_HEIGHT - 1)
+        if (col, row) not in snake_body:
+            return col, row
+
+
+def update_snake(apple_xy):
+    new_head = snake_body[0][0] + direction[0], snake_body[0][1] + direction[1]
+    snake_body.insert(0, new_head)
+    if apple_xy != new_head:
+        snake_body.pop(-1)
+    else:
+        apple_xy = place_apple()
+    return apple_xy
+
+
+# init snek
+snake_body = [(5 - x, FIELD_HEIGHT // 2) for x in range(3)]
+direction = DIRECTIONS['d']
 apple_pos = place_apple()
 
+colorama.init(autoreset=True)
+p(colorama.ansi.clear_screen())
 while True:
-	# clear field
-	os.system('cls')
-	
-	# draw field
-	print_field()
+    # draw field
+    print_field()
 
-	# get input
-	txt,_ = timedInput('',timeout = 0.3)
-	match txt:
-		case 'w': direction = DIRECTIONS['up']
-		case 'a': direction = DIRECTIONS['left']
-		case 's': direction = DIRECTIONS['down']
-		case 'd': direction = DIRECTIONS['right']
-		case 'q':
-			os.system('cls')
-			break
+    # get input
+    txt, _ = timedInput("   \r", SPEED)
+    if len(txt) and (txt[0] in 'wasd'):
+        direction = DIRECTIONS[txt[0]]
+    elif txt == 'q':
+        break
 
-	# update game 
-	update_snake()
-	apple_collision()
+    # update game
+    apple_pos = update_snake(apple_pos)
 
-	# check death
-	if snake_body[0][1] in (0, FIELD_HEIGHT - 1) or \
-	   snake_body[0][0] in (0,FIELD_WIDTH - 1) or\
-	   snake_body[0] in snake_body[1:]:
-		os.system('cls')
-		break
+    # check death
+    if is_border(*snake_body[0]) or snake_body[0] in snake_body[1:]:
+        break
+
+p(colorama.ansi.clear_screen())
