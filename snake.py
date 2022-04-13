@@ -19,6 +19,8 @@ def is_border(x, y):
 
 
 def print_field():
+    """ Ascii codes: https://theasciicode.com.ar/
+    """
     p(colorama.Cursor.POS())
     p(f"\n  SCORE: {colorama.Fore.RED}{len(snake_body) - 3}", end="\n  ")
     row = 0
@@ -27,11 +29,16 @@ def print_field():
         while col <= FIELD_WIDTH:
             cell = col, row
             if is_border(col, row):
-                p(colorama.Fore.CYAN + '█')
+                if row == 0:
+                    p(colorama.Fore.CYAN + '▄')
+                elif row == FIELD_HEIGHT:
+                    p(colorama.Fore.CYAN + '▀')
+                else:
+                    p(colorama.Fore.CYAN + '█')
             elif cell in snake_body:
-                p(colorama.Fore.GREEN + '░')
+                p(colorama.Fore.GREEN + '▒')
             elif cell == apple_pos:
-                p(colorama.Fore.RED + 'ò')
+                p(colorama.Fore.RED + 'Ó')
             else:
                 p(' ')
             col += 1
