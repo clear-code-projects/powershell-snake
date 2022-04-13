@@ -27,11 +27,11 @@ def print_field():
         while col <= FIELD_WIDTH:
             cell = col, row
             if is_border(col, row):
-                p(colorama.Fore.CYAN + '▓')
+                p(colorama.Fore.CYAN + '█')
             elif cell in snake_body:
                 p(colorama.Fore.GREEN + '░')
             elif cell == apple_pos:
-                p(colorama.Fore.RED + 'a')
+                p(colorama.Fore.RED + 'ò')
             else:
                 p(' ')
             col += 1
