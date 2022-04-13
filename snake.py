@@ -10,8 +10,8 @@ SPEED = 0.3
 DIRECTIONS = {'w': (0, -1), 'a': (-1, 0), 's': (0, 1), 'd': (1, 0)}
 
 
-def p(*args):
-    print(*args, end="")
+def p(*args, end=""):
+    print(*args, end=end)
 
 
 def is_border(x, y):
@@ -20,22 +20,23 @@ def is_border(x, y):
 
 def print_field():
     p(colorama.Cursor.POS())
+    p(f"\n  SCORE: {colorama.Fore.RED}{len(snake_body) - 3}", end="\n  ")
     row = 0
     while row <= FIELD_HEIGHT:
         col = 0
         while col <= FIELD_WIDTH:
             cell = col, row
             if is_border(col, row):
-                p(colorama.Fore.CYAN + 'X')
+                p(colorama.Fore.CYAN + '▓')
             elif cell in snake_body:
-                p(colorama.Fore.GREEN + 'X')
+                p(colorama.Fore.GREEN + '░')
             elif cell == apple_pos:
                 p(colorama.Fore.RED + 'a')
             else:
                 p(' ')
             col += 1
         row += 1
-        print()
+        p('\n  ')
 
 
 def place_apple():
@@ -69,8 +70,8 @@ while True:
 
     # get input
     txt, _ = timedInput("   \r", SPEED)
-    if txt and (txt in 'wasd'):
-        direction = DIRECTIONS[txt]
+    if len(txt) and (txt[0] in 'wasd'):
+        direction = DIRECTIONS[txt[0]]
     elif txt == 'q':
         break
 
