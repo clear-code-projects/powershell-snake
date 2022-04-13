@@ -41,8 +41,8 @@ def print_field():
 
 def place_apple():
     while True:
-        col = randint(1, FIELD_WIDTH - 2)
-        row = randint(1, FIELD_HEIGHT - 2)
+        col = randint(1, FIELD_WIDTH - 1)
+        row = randint(1, FIELD_HEIGHT - 1)
         if (col, row) not in snake_body:
             return col, row
 
