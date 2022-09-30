@@ -66,14 +66,17 @@ while True:
 
 	# get input
 	txt,_ = timedInput('',timeout = 0.3)
-	match txt:
-		case 'w': direction = DIRECTIONS['up']
-		case 'a': direction = DIRECTIONS['left']
-		case 's': direction = DIRECTIONS['down']
-		case 'd': direction = DIRECTIONS['right']
-		case 'q':
-			os.system('cls')
-			break
+	if txt == 'w':
+		direction = DIRECTIONS['up']
+	elif txt == 's':
+		direction = DIRECTIONS['down']	
+	elif txt == 'a':		
+		direction = DIRECTIONS['left']
+	elif txt == 'd':
+		direction = DIRECTIONS['right']
+	elif txt == 'q':
+		os.system('cls')
+		break
 
 	# update game 
 	update_snake()
